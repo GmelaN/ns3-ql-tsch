@@ -87,6 +87,20 @@ class LrWpanMacHeader : public Header
         LONGKEYSOURCE = 3
     };
 
+    enum FrameVersionType {
+        FRAME_VERSION_2003 = 0,
+        FRAME_VERSION_2006 = 1,
+        FRAME_VERSION_2011 = 2,
+        FRAME_VERSION_RESERVED = 3
+    };
+
+    struct HeaderIE {
+        uint8_t length; //7 bits
+        uint8_t id; //8 bits
+        bool type; //always 0
+        std::vector<uint8_t> content; //0-127 bytes
+    };
+
     LrWpanMacHeader();
 
     /**
@@ -397,6 +411,20 @@ class LrWpanMacHeader : public Header
     void Serialize(Buffer::Iterator start) const override;
     uint32_t Deserialize(Buffer::Iterator start) override;
 
+    //802.15.4e support
+    void SetHeaderIE(HeaderIE ie);
+    void SetIEField();
+    void SetNoIEField();
+    void SetSeqNumSup();
+    void SetNoSeqNumSup();
+    bool IsIEListPresent(void) const;
+    bool IsSeqNumSup (void) const;
+    bool IsNoSeqNumSup (void) const;
+    std::list<HeaderIE> GetIEList(void) const;
+    void NewAckIE(uint16_t);
+    void EndNoPayloadIE();
+    void EndPayloadIE();
+
   private:
     /* Frame Control 2 Octets */
     /* Frame Control field - see 7.2.1.1 */
@@ -408,7 +436,9 @@ class LrWpanMacHeader : public Header
     uint8_t m_fctrlAckReq;      //!< Frame Control field Bit 5
     uint8_t m_fctrlPanIdComp;   //!< Frame Control field Bit 6      = 0 - no compression, 1 - using
                                 //!< only DstPanId for both Src and DstPanId
-    uint8_t m_fctrlReserved;    //!< Frame Control field Bit 7-9
+    uint8_t m_fctrlReserved;    //!< Frame Control field Bit 7
+    uint8_t m_fctrlSeqNumSuppression; //!< Frame Control field Bit 8      = 0 - seq number present, 1 - no seq number
+    uint8_t m_fctrlIEListPresent;     //!< Frame Control field Bit 9      = 0 - no IE List, 1 - IE List present
     uint8_t m_fctrlDstAddrMode; //!< Frame Control field Bit 10-11  = 0 - No DstAddr, 2 -
                                 //!< ShtDstAddr, 3 - ExtDstAddr
     uint8_t m_fctrlFrmVer;      //!< Frame Control field Bit 12-13
@@ -448,6 +478,8 @@ class LrWpanMacHeader : public Header
     };                               //!< Auxiliary security header
 
     uint8_t m_auxKeyIdKeyIndex; //!< Auxiliary security header - Key Index (1 Octet)
+
+    std::list<HeaderIE> headerie; //IE Header List
 
 }; // LrWpanMacHeader
 

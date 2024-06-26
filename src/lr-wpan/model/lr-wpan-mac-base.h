@@ -115,6 +115,20 @@ enum MlmeScanType
     MLMESCAN_ORPHAN = 0x03
 };
 
+struct FrameControlOptions
+{
+    FrameControlOptions()
+        : m_PanIdSupressed(0),
+          IesIncluded(0),
+          SeqNSupressed(0)
+    {
+    }
+
+    bool m_PanIdSupressed;
+    bool IesIncluded;
+    bool SeqNSupressed;
+};
+
 /**
  * \ingroup lr-wpan
  *
@@ -129,6 +143,21 @@ struct McpsDataRequestParams
     Mac64Address m_dstExtAddr;             //!< Destination extended address
     uint8_t m_msduHandle{0};               //!< MSDU handle
     uint8_t m_txOptions{0};                //!< Tx Options (bitfield)
+
+    bool m_ACK_TX;
+    bool m_GTSTX;
+    bool m_IndirectTx;
+    uint8_t m_SecurityLevel;
+    uint8_t m_KeyIdMode;
+    std::vector<uint8_t> m_KeySource;
+    uint8_t m_KeyIndex;
+
+    // 802.15.4e
+
+    FrameControlOptions m_frameControlOptions;
+    std::vector<uint8_t> m_headerIElist;
+    std::vector<uint8_t> m_payloadIElist;
+    bool m_sendMultipurpose;
 };
 
 /**
@@ -331,6 +360,7 @@ struct McpsDataConfirmParams
     uint8_t m_msduHandle{0};                          //!< MSDU handle
     MacStatus m_status{MacStatus::INVALID_PARAMETER}; //!< The status
                                                       //!< of the last MSDU transmission
+    uint64_t m_macASN;                                //!< The 64-bit value of the ASN
 };
 
 /**
@@ -350,6 +380,7 @@ struct McpsDataIndicationParams
     Mac64Address m_dstExtAddr;         //!< Destination extended address
     uint8_t m_mpduLinkQuality{0};      //!< LQI value measured during reception of the MPDU
     uint8_t m_dsn{0};                  //!< The DSN of the received data frame
+    uint64_t m_macASN;                //!< The 64-bit value of the ASN
 };
 
 /**

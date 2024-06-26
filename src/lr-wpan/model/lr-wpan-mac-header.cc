@@ -79,20 +79,32 @@ LrWpanMacHeader::GetType() const
 }
 
 uint16_t
-LrWpanMacHeader::GetFrameControl() const
+LrWpanMacHeader::GetFrameControl (void) const
 {
     uint16_t val = 0;
 
-    val = m_fctrlFrmType & (0x07);                    // Bit 0-2
-    val |= (m_fctrlSecU << 3) & (0x01 << 3);          // Bit 3
-    val |= (m_fctrlFrmPending << 4) & (0x01 << 4);    // Bit 4
+    val = m_fctrlFrmType & (0x07);                 // Bit 0-2
+    val |= (m_fctrlSecU << 3) & (0x01 << 3);         // Bit 3
+    val |= (m_fctrlFrmPending << 4) & (0x01 << 4);   // Bit 4
     val |= (m_fctrlAckReq << 5) & (0x01 << 5);        // Bit 5
-    val |= (m_fctrlPanIdComp << 6) & (0x01 << 6);     // Bit 6
-    val |= (m_fctrlReserved << 7) & (0x07 << 7);      // Bit 7-9
+    val |= (m_fctrlPanIdComp << 6) & (0x01 << 6);    // Bit 6
+
+
     val |= (m_fctrlDstAddrMode << 10) & (0x03 << 10); // Bit 10-11
-    val |= (m_fctrlFrmVer << 12) & (0x03 << 12);      // Bit 12-13
+    val |= (m_fctrlFrmVer << 12) & (0x03 << 12);     // Bit 12-13
     val |= (m_fctrlSrcAddrMode << 14) & (0x03 << 14); // Bit 14-15
+
+    //802.15.4e
+    if (m_fctrlFrmVer == 2) {
+
+        val |= (m_fctrlReserved << 7) & (0x01 << 7);          // Bit 7
+        val |= (m_fctrlSeqNumSuppression << 8) & (0x01 << 8);          // Bit 8
+        val |= (m_fctrlIEListPresent << 9) & (0x01 << 9);          // Bit 9
+    } else {
+        val |= (m_fctrlReserved << 7) & (0x07 << 7);           // Bit 7-9
+    }
     return val;
+
 }
 
 bool
@@ -522,6 +534,24 @@ LrWpanMacHeader::Print(std::ostream& os) const
             break;
         }
     }
+
+    if (m_fctrlIEListPresent == 1) {
+        os << " IE List: ";
+
+        for (std::list<HeaderIE>::const_iterator it = headerie.begin();it!=headerie.end();it++) {
+
+            os << "Lenght = " << (uint32_t) it->length
+               << ", Type = " << (uint32_t) it->type
+               << ", ID = " << (uint32_t)  it->id;
+
+            os << ", Data: ";
+            for (std::vector<uint8_t>::const_iterator it2 = it->content.begin();it2!=it->content.end();it2++) {
+                os << static_cast<uint32_t>(*it2);
+            }
+            os << "; ";
+
+        }
+    }
 }
 
 uint32_t
@@ -536,6 +566,7 @@ LrWpanMacHeader::GetSerializedSize() const
      * Src PAN Id         : 0/2 octet
      * Src Address        : 0/2/8 octet
      * Aux Sec Header     : 0/5/6/10/14 octet
+     * IE Header          : variable
      */
 
     uint32_t size = 3;
@@ -597,6 +628,12 @@ LrWpanMacHeader::GetSerializedSize() const
         case LONGKEYSOURCE:
             size += 9;
             break;
+        }
+    }
+
+    if (m_fctrlIEListPresent == 1 && m_fctrlFrmVer == 2) {
+        for (std::list<HeaderIE>::const_iterator it = headerie.begin() ; it != headerie.end() ; it++) {
+            size+=it->length + 2;
         }
     }
     return size;
@@ -665,6 +702,22 @@ LrWpanMacHeader::Serialize(Buffer::Iterator start) const
             i.WriteHtolsbU64(GetKeyIdSrc64());
             i.WriteU8(GetKeyIdIndex());
             break;
+        }
+    }
+
+    if (m_fctrlIEListPresent == 1 && m_fctrlFrmVer == 2) {
+        for (std::list<HeaderIE>::const_iterator it = headerie.begin();it!=headerie.end();it++) {
+            uint16_t desc = 0;
+
+            desc |= (it->length << 9) & (0xfe00); //7bits
+            //desc |= 0x00 ; //1 bit
+            desc |= (it->id << 1) & (0x01fe); //8bits
+
+            i.WriteHtolsbU16(desc);
+
+            for (uint8_t j = 0; j < it->length ;j++) {
+                i.WriteU8 (it->content[j]);
+            }
         }
     }
 }
@@ -745,7 +798,118 @@ LrWpanMacHeader::Deserialize(Buffer::Iterator start)
             break;
         }
     }
+
+    //802.15.4 IE Header
+    if (m_fctrlFrmVer == 2 && m_fctrlIEListPresent == 1) {
+        uint8_t lastid;
+
+        do {
+            HeaderIE* newie = new HeaderIE;
+            uint16_t head = i.ReadLsbtohU16 ();
+            newie->length = (head >> 9); //7 bits
+            newie->id = (head >> 1); //8bits
+            newie->type = 0; //1bit
+
+            for (int j = 0;j<newie->length ;j++) {
+                newie->content.push_back(i.ReadU8 ());
+            }
+
+            headerie.push_back(*newie);
+            lastid = newie->id;
+
+        } while (lastid != 0x7e && lastid != 0x7f);
+    }
+
     return i.GetDistanceFrom(start);
+}
+
+//802.15.4e
+void
+LrWpanMacHeader::NewAckIE(uint16_t t)
+{
+    HeaderIE ack;
+
+    ack.length = 2;
+    ack.id = 0x1e;
+    ack.type = 0x0;
+
+    ack.content.push_back((t >> (8)) & 0xff);
+    ack.content.push_back(t);
+
+    headerie.push_back(ack);
+}
+
+void
+LrWpanMacHeader::EndNoPayloadIE()
+{
+
+    if (m_fctrlFrmVer == 2) {
+        if (m_fctrlIEListPresent == 1) {
+            HeaderIE endie;
+            endie.id = 0x7f;
+            endie.length = 0;
+
+            headerie.push_back(endie);
+        }
+    }
+}
+
+void
+LrWpanMacHeader::EndPayloadIE()
+{
+
+    if (m_fctrlFrmVer == 2) {
+        if (m_fctrlIEListPresent == 1) {
+            HeaderIE endie;
+            endie.id = 0x7e;
+            endie.length = 0;
+
+            headerie.push_back(endie);
+        }
+    }
+}
+
+std::list<LrWpanMacHeader::HeaderIE>
+LrWpanMacHeader::GetIEList(void) const
+{
+    return headerie;
+}
+
+bool
+LrWpanMacHeader::IsSeqNumSup (void) const
+{
+    return (m_fctrlSeqNumSuppression == 1);
+}
+
+bool
+LrWpanMacHeader::IsNoSeqNumSup (void) const
+{
+    return (m_fctrlSeqNumSuppression == 0);
+}
+
+void LrWpanMacHeader::SetIEField()
+{
+    m_fctrlIEListPresent = 1;
+}
+
+void LrWpanMacHeader::SetNoIEField()
+{
+    m_fctrlIEListPresent = 0;
+}
+
+void LrWpanMacHeader::SetSeqNumSup()
+{
+    m_fctrlSeqNumSuppression = 1;
+}
+
+void LrWpanMacHeader::SetNoSeqNumSup()
+{
+    m_fctrlSeqNumSuppression = 0;
+}
+
+bool LrWpanMacHeader::IsIEListPresent (void) const
+{
+    return (m_fctrlIEListPresent == 1);
 }
 
 } // namespace lrwpan

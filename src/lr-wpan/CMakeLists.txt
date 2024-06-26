@@ -2,6 +2,9 @@ build_lib(
   LIBNAME lr-wpan
   SOURCE_FILES
     helper/lr-wpan-helper.cc
+    helper/lr-wpan-tsch-helper.cc
+    helper/lr-wpan-energy-source-helper.cc
+    helper/lr-wpan-radio-energy-model-helper.cc
     model/lr-wpan-csmaca.cc
     model/lr-wpan-error-model.cc
     model/lr-wpan-fields.cc
@@ -16,8 +19,16 @@ build_lib(
     model/lr-wpan-phy.cc
     model/lr-wpan-spectrum-signal-parameters.cc
     model/lr-wpan-spectrum-value-helper.cc
+    model/lr-wpan-tsch-net-device.cc
+    model/lr-wpan-tsch-mac.cc
+    model/lr-wpan-energy-source.cc
+    model/lr-wpan-radio-energy-model.cc
   HEADER_FILES
     helper/lr-wpan-helper.h
+    helper/lr-wpan-tsch-helper.h
+    helper/lr-wpan-energy-source-helper.h
+    helper/lr-wpan-radio-energy-model-helper.h
+    model/lr-wpan-array.h
     model/lr-wpan-constants.h
     model/lr-wpan-csmaca.h
     model/lr-wpan-error-model.h
@@ -33,7 +44,13 @@ build_lib(
     model/lr-wpan-phy.h
     model/lr-wpan-spectrum-signal-parameters.h
     model/lr-wpan-spectrum-value-helper.h
-  LIBRARIES_TO_LINK ${libspectrum}
+    model/lr-wpan-tsch-net-device.h
+    model/lr-wpan-tsch-mac.h
+    model/lr-wpan-energy-source.h
+    model/lr-wpan-radio-energy-model.h
+  LIBRARIES_TO_LINK
+    ${libenergy}
+    ${libspectrum}
   TEST_SOURCES
     test/lr-wpan-ack-test.cc
     test/lr-wpan-cca-test.cc

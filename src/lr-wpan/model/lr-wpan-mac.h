@@ -300,7 +300,7 @@ class LrWpanMac : public LrWpanMacBase
      * \param p the packet to be transmitted
      * \param lqi Link quality (LQI) value measured during reception of the PPDU
      */
-    void PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi);
+    virtual void PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi);
 
     /**
      * IEEE 802.15.4-2006 section 6.2.1.2
@@ -308,14 +308,14 @@ class LrWpanMac : public LrWpanMacBase
      * \param status to report to MAC
      *        PHY PD-DATA.confirm status
      */
-    void PdDataConfirm(PhyEnumeration status);
+    virtual void PdDataConfirm(PhyEnumeration status);
 
     /**
      * IEEE 802.15.4-2006 section 6.2.2.2
      * PLME-CCA.confirm status
      * \param status TRX_OFF, BUSY or IDLE
      */
-    void PlmeCcaConfirm(PhyEnumeration status);
+    virtual void PlmeCcaConfirm(PhyEnumeration status);
 
     /**
      * IEEE 802.15.4-2006 section 6.2.2.4
@@ -323,7 +323,7 @@ class LrWpanMac : public LrWpanMacBase
      * \param status SUCCESS, TRX_OFF or TX_ON
      * \param energyLevel 0x00-0xff ED level for the channel
      */
-    void PlmeEdConfirm(PhyEnumeration status, uint8_t energyLevel);
+    virtual void PlmeEdConfirm(PhyEnumeration status, uint8_t energyLevel);
 
     /**
      * IEEE 802.15.4-2006 section 6.2.2.6
@@ -333,7 +333,7 @@ class LrWpanMac : public LrWpanMacBase
      * \param id the attributed identifier
      * \param attribute the attribute value
      */
-    void PlmeGetAttributeConfirm(PhyEnumeration status,
+    virtual void PlmeGetAttributeConfirm(PhyEnumeration status,
                                  PhyPibAttributeIdentifier id,
                                  Ptr<PhyPibAttributes> attribute);
 
@@ -343,7 +343,7 @@ class LrWpanMac : public LrWpanMacBase
      * Set PHY state
      * \param status in RX_ON,TRX_OFF,FORCE_TRX_OFF,TX_ON
      */
-    void PlmeSetTRXStateConfirm(PhyEnumeration status);
+    virtual void PlmeSetTRXStateConfirm(PhyEnumeration status);
 
     /**
      * IEEE 802.15.4-2006 section 6.2.2.10
@@ -352,7 +352,7 @@ class LrWpanMac : public LrWpanMacBase
      * \param status SUCCESS, UNSUPPORTED_ATTRIBUTE, INVALID_PARAMETER, or READ_ONLY
      * \param id the attributed identifier
      */
-    void PlmeSetAttributeConfirm(PhyEnumeration status, PhyPibAttributeIdentifier id);
+    virtual void PlmeSetAttributeConfirm(PhyEnumeration status, PhyPibAttributeIdentifier id);
 
     /**
      * CSMA-CA algorithm calls back the MAC after executing channel assessment.
