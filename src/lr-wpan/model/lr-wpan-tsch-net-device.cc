@@ -195,8 +195,8 @@ LrWpanTschNetDevice::SetChannel(Ptr<SpectrumChannel> channel)
 Ptr<LrWpanTschMac>
 LrWpanTschNetDevice::GetNMac(void) const
 {
-    // NS_LOG_FUNCTION (this);
-    // assert(m_isTsch==true);
+    NS_LOG_FUNCTION (this);
+    assert(m_isTsch==true);
     return m_mac;
 }
 

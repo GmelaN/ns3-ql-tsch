@@ -35,7 +35,7 @@
 #include <ns3/sequence-number.h>
 #include <ns3/traced-callback.h>
 #include <ns3/traced-value.h>
-
+#include <bitset>
 #include <deque>
 #include <memory>
 
@@ -81,7 +81,7 @@ enum TschMacState
 //    bool IesIncluded;
 //    bool SeqNSupressed;
 //};
-//
+
 //struct TschMcpsDataRequestParams
 //{
 //    AddressMode m_srcAddrMode{SHORT_ADDR}; //!< Source address mode
