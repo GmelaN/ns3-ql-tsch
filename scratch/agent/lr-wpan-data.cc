@@ -1,3 +1,4 @@
+#include "ns3/multi-model-spectrum-channel.h"
 #include "rl-agent.h"
 
 #include "ns3/constant-position-mobility-model.h"
@@ -97,6 +98,8 @@ MacStatusToString(MacStatus status)
         return "MAC_SCAN_IN_PROGRESS";
     case MacStatus::SUPERFRAME_OVERLAP:
         return "MAC_SUPERFRAME_OVERLAP";
+    default:
+        return "UNSUPPORTED_ATTRIBUTE";
     }
 }
 
@@ -113,16 +116,16 @@ StateChangeNotification(std::string context,
                         PhyEnumeration oldState,
                         PhyEnumeration newState)
 {
-    //    NS_LOG_UNCOND(context << " state change at " << now.As(Time::S) << " from "
-    //                          << LrWpanTschHelper::LrWpanPhyEnumerationPrinter(oldState) << " to "
-    //                          << LrWpanTschHelper::LrWpanPhyEnumerationPrinter(newState));
+    NS_LOG_UNCOND(context << " state change at " << now.As(Time::S) << " from "
+                          << LrWpanTschHelper::LrWpanPhyEnumerationPrinter(oldState) << " to "
+                          << LrWpanTschHelper::LrWpanPhyEnumerationPrinter(newState));
 }
 
 std::pair<std::vector<Agent*>*, DeviceEnergyModelContainer>
 InitializeNetwork(uint16_t node_count,
                   uint16_t slotframe_size,
                   QAgentParams params,
-                  Ptr<SingleModelSpectrumChannel> channel,
+                  Ptr<SpectrumChannel> channel,
                   LrWpanTschHelper* lrWpanHelper)
 {
     std::vector<Agent*>* agents = new std::vector<Agent*>();
@@ -193,11 +196,11 @@ InitializeNetwork(uint16_t node_count,
 int
 main(int argc, char* argv[])
 {
-    int nodeCount = 100;
+    int nodeCount = 2;
     int slotframeSize = 15;
     double packetProbability = 0.03;
     int packetSize = 50;
-    int simulationTime = 1000;
+    int simulationTime = 2;
     double successReward = 1;
     double failureReward = -1;
 
@@ -224,13 +227,13 @@ main(int argc, char* argv[])
 
     LrWpanTschHelper lrWpanHelper;
 
-//    lrWpanHelper.EnableLogComponents();
+    lrWpanHelper.EnableLogComponents();
 
     // Enable calculation of FCS in the trailers. Only necessary when interacting with real devices
     // or wireshark. GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
 
     // Each device must be attached to the same channel
-    Ptr<SingleModelSpectrumChannel> channel = CreateObject<SingleModelSpectrumChannel>();
+    Ptr<MultiModelSpectrumChannel> channel = CreateObject<MultiModelSpectrumChannel>();
     Ptr<LogDistancePropagationLossModel> propModel =
         CreateObject<LogDistancePropagationLossModel>();
     Ptr<ConstantSpeedPropagationDelayModel> delayModel =
