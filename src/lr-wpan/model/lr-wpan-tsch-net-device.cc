@@ -36,7 +36,7 @@
 #include <ns3/pointer.h>
 #include <ns3/spectrum-channel.h>
 
-#include <cassert>
+// #include <cassert>
 
 NS_LOG_COMPONENT_DEFINE("LrWpanTschNetDevice");
 
@@ -283,7 +283,7 @@ void
 LrWpanTschNetDevice::SetAddress(Address address)
 {
     NS_LOG_FUNCTION(this);
-    assert(m_isTsch >= 0);
+    NS_ASSERT(m_isTsch >= 0);
     if (m_isTsch)
         m_mac->SetShortAddress(Mac16Address::ConvertFrom(address));
     else
@@ -294,7 +294,7 @@ Address
 LrWpanTschNetDevice::GetAddress(void) const
 {
     NS_LOG_FUNCTION(this);
-    assert(m_isTsch >= 0);
+    NS_ASSERT(m_isTsch >= 0);
     if (m_isTsch)
         return m_mac->GetShortAddress();
     else
@@ -424,7 +424,7 @@ LrWpanTschNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t prot
         return false;
     }
 
-    assert(m_isTsch >= 0);
+    NS_ASSERT(m_isTsch >= 0);
     if (m_isTsch)
     {
         McpsDataRequestParams m_mcpsDataRequestParams;
@@ -476,7 +476,7 @@ LrWpanTschNetDevice::Send(Ptr<Packet> packet,
         return false;
     }
 
-    assert(m_isTsch >= 0);
+    NS_ASSERT(m_isTsch >= 0);
     if (m_isTsch)
     {
         McpsDataRequestParams m_mcpsDataRequestParams;
