@@ -196,7 +196,7 @@ Ptr<LrWpanTschMac>
 LrWpanTschNetDevice::GetNMac(void) const
 {
     NS_LOG_FUNCTION (this);
-    assert(m_isTsch==true);
+    NS_ASSERT(m_isTsch==true);
     return m_mac;
 }
 
@@ -204,7 +204,7 @@ Ptr<LrWpanMac>
 LrWpanTschNetDevice::GetOMac(void) const
 {
     // NS_LOG_FUNCTION (this);
-    // assert(m_isTsch==false);
+    // NS_ASSERT(m_isTsch==false);
     // if (m_isTsch) return m_mac;
     return m_omac;
 }
@@ -213,7 +213,7 @@ Ptr<LrWpanMac>
 LrWpanTschNetDevice::GetMac(void) const
 {
     // NS_LOG_FUNCTION (this);
-    assert(m_isTsch >= 0);
+    NS_ASSERT(m_isTsch >= 0);
     if (m_isTsch)
     {
         return m_mac;
