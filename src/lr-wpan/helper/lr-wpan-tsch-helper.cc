@@ -346,6 +346,9 @@ LrWpanTschHelper::AddMobility(Ptr<LrWpanPhy> phy, Ptr<MobilityModel> m)
 NetDeviceContainer
 LrWpanTschHelper::Install(NodeContainer c)
 {
+    // mac address for global identification
+    static uint16_t macAddress = 0;
+
     NetDeviceContainer devices;
     for (auto i = c.Begin(); i != c.End(); i++)
     {
@@ -355,6 +358,8 @@ LrWpanTschHelper::Install(NodeContainer c)
         netDevice->SetChannel(m_channel);
         node->AddDevice(netDevice);
         netDevice->SetNode(node);
+        netDevice->SetTschMode(true);
+        netDevice->SetAddress(Mac16Address(macAddress++));
         // \todo add the capability to change short address, extended
         // address and panId. Right now they are hardcoded in LrWpanTschMac::LrWpanTschMac ()
         devices.Add(netDevice);
@@ -427,7 +432,7 @@ void
 LrWpanTschHelper::AssociateToPan(NetDeviceContainer c, uint16_t panId)
 {
     NetDeviceContainer devices;
-static     uint16_t s_id = 1;
+    static uint16_t s_id = 1;
     uint8_t idBuf[2];
 
     for (NetDeviceContainer::Iterator i = c.Begin(); i != c.End(); i++)
