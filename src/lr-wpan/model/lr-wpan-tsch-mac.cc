@@ -1581,8 +1581,9 @@ LrWpanTschMac::ScheduleTimeslot(uint8_t handle, uint16_t size)
 
                 // Change channel
                 NS_LOG_DEBUG("TSCH Changing to channel " << (int)m_currentChannel);
-                PhyPibAttributes* phyattr = new PhyPibAttributes();
-                phyattr->phyCurrentChannel = m_currentChannel;
+                Ptr<PhyPibAttributes> phyAttr = Create<PhyPibAttributes>();
+                // PhyPibAttributes* phyattr = new PhyPibAttributes();
+                phyAttr->phyCurrentChannel = m_currentChannel;
                 //                if (it->macLinkFadingBias != NULL) # TODO: Check if it is
                 //                necessary in the new phy
                 //                {
@@ -1601,7 +1602,7 @@ LrWpanTschMac::ScheduleTimeslot(uint8_t handle, uint16_t size)
                 Simulator::ScheduleNow(&LrWpanPhy::PlmeSetAttributeRequest,
                                        m_phy,
                                        phyCurrentChannel,
-                                       phyattr);
+                                       phyAttr);
             }
 
             if (it->macLinkOptions[0])
