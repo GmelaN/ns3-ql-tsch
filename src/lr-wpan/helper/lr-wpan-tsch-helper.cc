@@ -427,7 +427,7 @@ void
 LrWpanTschHelper::AssociateToPan(NetDeviceContainer c, uint16_t panId)
 {
     NetDeviceContainer devices;
-    uint16_t id = 1;
+static     uint16_t s_id = 1;
     uint8_t idBuf[2];
 
     for (NetDeviceContainer::Iterator i = c.Begin(); i != c.End(); i++)
@@ -435,8 +435,8 @@ LrWpanTschHelper::AssociateToPan(NetDeviceContainer c, uint16_t panId)
         Ptr<LrWpanTschNetDevice> device = DynamicCast<LrWpanTschNetDevice>(*i);
         if (device)
         {
-            idBuf[0] = (id >> 8) & 0xff;
-            idBuf[1] = (id >> 0) & 0xff;
+            idBuf[0] = (s_id >> 8) & 0xff;
+            idBuf[1] = (s_id >> 0) & 0xff;
             Mac16Address address;
             address.CopyFrom(idBuf);
 
@@ -444,7 +444,7 @@ LrWpanTschHelper::AssociateToPan(NetDeviceContainer c, uint16_t panId)
             device->GetOMac()->SetShortAddress(address);
             device->GetNMac()->SetPanId(panId);
             device->GetNMac()->SetShortAddress(address);
-            id++;
+            s_id++;
         }
     }
 }
