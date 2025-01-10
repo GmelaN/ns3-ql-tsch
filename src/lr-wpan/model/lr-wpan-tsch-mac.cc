@@ -1207,7 +1207,59 @@ LrWpanTschMac::SetPanId(uint16_t PanId)
 void
 LrWpanTschMac::ChangeMacState(TschMacState newState)
 {
-    NS_LOG_LOGIC(this << " change lrwpan mac state from " << m_macState << " to " << newState);
+    char* current, *new_;
+
+    switch(newState) {
+        case TSCH_MAC_IDLE:
+            current = "TSCH_MAC_IDLE"; break;
+        case TSCH_MAC_CCA:
+            current = "TSCH_MAC_CCA"; break;
+        case TSCH_MAC_SENDING:
+            current = "TSCH_MAC_SENDING"; break;
+        case TSCH_MAC_ACK_PENDING:
+            current = "TSCH_MAC_ACK_PENDING"; break;
+        case TSCH_MAC_ACK_PENDING_END:
+            current = "TSCH_MAC_ACK_PENDING_END"; break;
+        case TSCH_CHANNEL_ACCESS_FAILURE:
+            current = "TSCH_CHANNEL_ACCESS_FAILURE"; break;
+        case TSCH_CHANNEL_IDLE:
+            current = "TSCH_CHANNEL_IDLE"; break;
+        case TSCH_SET_PHY_TX_ON:
+            current = "TSCH_SET_PHY_TX_ON"; break;
+        case TSCH_MAC_RX:
+            current = "TSCH_MAC_RX"; break;
+        case TSCH_PKT_WAIT_END:
+            current = "TSCH_PKT_WAIT_END"; break;
+        default:
+            current = "UNDEFINED";
+    }
+
+    switch(m_macState) {
+        case TSCH_MAC_IDLE:
+            new_ = "TSCH_MAC_IDLE"; break;
+        case TSCH_MAC_CCA:
+            new_ = "TSCH_MAC_CCA"; break;
+        case TSCH_MAC_SENDING:
+            new_ = "TSCH_MAC_SENDING"; break;
+        case TSCH_MAC_ACK_PENDING:
+            new_ = "TSCH_MAC_ACK_PENDING"; break;
+        case TSCH_MAC_ACK_PENDING_END:
+            new_ = "TSCH_MAC_ACK_PENDING_END"; break;
+        case TSCH_CHANNEL_ACCESS_FAILURE:
+            new_ = "TSCH_CHANNEL_ACCESS_FAILURE"; break;
+        case TSCH_CHANNEL_IDLE:
+            new_ = "TSCH_CHANNEL_IDLE"; break;
+        case TSCH_SET_PHY_TX_ON:
+            new_ = "TSCH_SET_PHY_TX_ON"; break;
+        case TSCH_MAC_RX:
+            new_ = "TSCH_MAC_RX"; break;
+        case TSCH_PKT_WAIT_END:
+            new_ = "TSCH_PKT_WAIT_END"; break;
+        default:
+            new_ = "UNDEFINED";
+    }
+
+    NS_LOG_LOGIC(this << " change lrwpan mac state from " << current << " to " << new_);
     m_macStateLogger(m_macState, newState);
     m_macState = newState;
 }
