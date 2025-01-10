@@ -1352,6 +1352,7 @@ LrWpanTschHelper::SendPacket(Ptr<NetDevice> dev,
     if (Now().GetSeconds() <= end)
     {
         Ptr<Packet> pkt = Create<Packet>(packet_size);
+        NS_LOG_UNCOND("Issuing packet...");
         dev->Send(pkt, dst, 0x86DD);
     }
 
