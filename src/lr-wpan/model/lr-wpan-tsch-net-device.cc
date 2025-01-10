@@ -432,7 +432,7 @@ LrWpanTschNetDevice::Send(Ptr<Packet> packet, const Address& dest, uint16_t prot
         m_mcpsDataRequestParams.m_frameControlOptions = frmcontrol;
         m_mcpsDataRequestParams.m_dstAddr = Mac16Address::ConvertFrom(dest);
         m_mcpsDataRequestParams.m_dstAddrMode = SHORT_ADDR;
-        m_mcpsDataRequestParams.m_srcAddrMode = NO_PANID_ADDR;
+        m_mcpsDataRequestParams.m_srcAddrMode = SHORT_ADDR;
 
         m_mcpsDataRequestParams.m_ACK_TX =
             (Mac16Address::ConvertFrom(dest) == Mac16Address("ff:ff")) ? false : m_useAcks;
