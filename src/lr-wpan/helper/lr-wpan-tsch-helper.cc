@@ -346,8 +346,8 @@ LrWpanTschHelper::AddMobility(Ptr<LrWpanPhy> phy, Ptr<MobilityModel> m)
 NetDeviceContainer
 LrWpanTschHelper::Install(NodeContainer c)
 {
-    // mac address for global identification
-    static uint16_t macAddress = 0;
+    // mac address for global identification: 00:00 is bca
+    static uint16_t macAddress = 1;
 
     NetDeviceContainer devices;
     for (auto i = c.Begin(); i != c.End(); i++)
