@@ -354,8 +354,16 @@ LrWpanTschMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
         // TODO
     }
 
-    if (params.m_frameControlOptions.m_PanIdSupressed)
-    {
+    // if (params.m_frameControlOptions.m_PanIdSupressed)
+    // {
+    //     macHdr.SetPanIdComp();
+    // }
+    // else
+    // {
+    //     macHdr.SetNoPanIdComp();
+    // }
+
+    // always on PAN ID COMPARE
         macHdr.SetPanIdComp();
     }
     else
