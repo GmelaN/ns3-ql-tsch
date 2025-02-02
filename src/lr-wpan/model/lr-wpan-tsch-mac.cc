@@ -802,6 +802,13 @@ LrWpanTschMac::SendAck(uint8_t seqno, bool seqnumsup)
 
     // Generate a corresponding ACK Frame.
     LrWpanMacHeader macHdr;
+
+    // PAN ID COMPARE
+    uint16_t frameControl = 0x0000; // 초기 값 설정
+    frameControl |= (1 << 6);      // 6번째 비트를 1로 설정
+    macHdr.SetFrameControl(frameControl);
+
+
     macHdr.SetType(LrWpanMacHeader::LRWPAN_MAC_ACKNOWLEDGMENT);
     macHdr.SetFrameVer(2);
     if (!seqnumsup)
@@ -934,7 +941,7 @@ LrWpanTschMac::PdDataConfirm(PhyEnumeration status)
         }
         else
         {
-            NS_LOG_DEBUG("ACK transmission sussesfull");
+            NS_LOG_DEBUG("ACK transmission sussesful");
             m_macRxDataTxAckTrace(m_latestPacketSize);
             // We have send an ACK. Clear the packet buffer.
             m_txPkt = 0;
