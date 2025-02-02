@@ -540,6 +540,7 @@ LrWpanPhy::CheckInterference()
 
             if (m_random->GetValue() < per)
             {
+                NS_LOG_DEBUG("packet will destroyed.");
                 // The packet was destroyed, drop the packet after reception.
                 m_currentRxPacket.second = true;
             }
