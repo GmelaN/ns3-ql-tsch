@@ -365,11 +365,7 @@ LrWpanTschMac::McpsDataRequest(McpsDataRequestParams params, Ptr<Packet> p)
 
     // always on PAN ID COMPARE
         macHdr.SetPanIdComp();
-    }
-    else
-    {
-        macHdr.SetNoPanIdComp();
-    }
+
 
     if (params.m_frameControlOptions.IesIncluded)
     {
