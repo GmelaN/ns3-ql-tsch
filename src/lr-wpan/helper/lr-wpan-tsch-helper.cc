@@ -45,6 +45,12 @@ namespace ns3
 namespace lrwpan
 {
 
+void
+LrWpanTschHelper::SetChannel(Ptr<SpectrumChannel> channel)
+{
+    m_channel = channel;
+}
+
 static void
 AsciiLrWpanTschMacTransmitSinkWithContext(Ptr<OutputStreamWrapper> stream,
                                           std::string context,
@@ -257,14 +263,14 @@ LrWpanTschHelper::EnableLogComponents(void)
     LogComponentEnableAll(LOG_PREFIX_TIME);
     LogComponentEnableAll(LOG_PREFIX_NODE);
     LogComponentEnableAll(LOG_PREFIX_FUNC);
-    LogComponentEnable("LrWpanCsmaCa", LOG_LEVEL_ALL);
-    LogComponentEnable("LrWpanErrorModel", LOG_LEVEL_ALL);
-    LogComponentEnable("LrWpanInterferenceHelper", LOG_LEVEL_ALL);
-    LogComponentEnable("LrWpanTschMac", LOG_LEVEL_ALL);
-    LogComponentEnable("LrWpanTschNetDevice", LOG_LEVEL_ALL);
-    LogComponentEnable("LrWpanPhy", LOG_LEVEL_ALL);
-    LogComponentEnable("LrWpanSpectrumSignalParameters", LOG_LEVEL_ALL);
-    LogComponentEnable("LrWpanSpectrumValueHelper", LOG_LEVEL_ALL);
+    // LogComponentEnable("LrWpanCsmaCa", LOG_LEVEL_ALL);
+    // LogComponentEnable("LrWpanErrorModel", LOG_LEVEL_ALL);
+    // LogComponentEnable("LrWpanInterferenceHelper", LOG_LEVEL_DEBUG);
+    LogComponentEnable("LrWpanTschMac", LOG_LEVEL_DEBUG);
+    // LogComponentEnable("LrWpanTschNetDevice", LOG_LEVEL_ALL);
+    LogComponentEnable("LrWpanPhy", LOG_LEVEL_INFO);
+    // LogComponentEnable("LrWpanSpectrumSignalParameters", LOG_LEVEL_ALL);
+    // LogComponentEnable("LrWpanSpectrumValueHelper", LOG_LEVEL_ALL);
 }
 
 std::string
@@ -379,7 +385,7 @@ LrWpanTschHelper::InstallVector(NodeContainer c)
         netDevice->SetChannel(m_channel);
         node->AddDevice(netDevice);
         netDevice->SetNode(node);
-        // \todo add the capability to change short address, extended
+        // todo: add the capability to change short address, extended
         // address and panId. Right now they are hardcoded in LrWpanTschMac::LrWpanTschMac ()
         devices.push_back(netDevice);
     }
@@ -1026,6 +1032,11 @@ LrWpanTschHelper::AddLink(NetDeviceContainer devs,
     {
         linkRequest.linkOptions.set(2, 1);
     }
+
+
+    NS_LOG_UNCOND("\t\tChannel Offset: " << linkRequest.ChannelOffset);
+
+
     linkRequest.linkType = MlmeSetLinkRequestlinkType_NORMAL;
     linkRequest.nodeAddr = Mac16Address::ConvertFrom(devs.Get(dstPos)->GetAddress());
     //    linkRequest.linkFadingBias = FadingBias[dstPos][srcPos];
@@ -1343,15 +1354,25 @@ LrWpanTschHelper::GenerateTraffic(Ptr<NetDevice> dev,
 }
 
 void
+LrWpanTschHelper::SendOnePacket(Ptr<NetDevice> dev,
+                             Ptr<Packet> pkt,
+                             Address dst)
+{
+    NS_LOG_UNCOND("Issuing packet...");
+    dev->Send(pkt, dst, 0x86DD);
+}
+
+
+void
 LrWpanTschHelper::SendPacket(Ptr<NetDevice> dev,
                              Address dst,
                              int packet_size,
                              double interval,
                              double end)
 {
+    Ptr<Packet> pkt = Create<Packet>(packet_size);
     if (Now().GetSeconds() <= end)
     {
-        Ptr<Packet> pkt = Create<Packet>(packet_size);
         NS_LOG_UNCOND("Issuing packet...");
         dev->Send(pkt, dst, 0x86DD);
     }

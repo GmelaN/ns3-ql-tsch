@@ -67,6 +67,9 @@ struct AddLinkParams
 class LrWpanTschHelper : public PcapHelperForDevice, public AsciiTraceHelperForDevice
 {
   public:
+    void SetChannel(Ptr<SpectrumChannel> channel);
+
+
     /**
      * @brief LrWpanTschHelper: Create a LrWpan helper in an empty state.
      */
@@ -281,6 +284,15 @@ class LrWpanTschHelper : public PcapHelperForDevice, public AsciiTraceHelperForD
      * @param end
      */
     void SendPacket(Ptr<NetDevice> dev, Address dst, int packet_size, double interval, double end);
+
+    /**
+     * @brief SendOnePacket
+     * @param dev
+     * @param dst
+     * @param pkt
+     */
+    void SendOnePacket(Ptr<NetDevice> dev, Ptr<Packet> pkt, Address dst);
+
 
     /**
      * @brief Add an advertising link
