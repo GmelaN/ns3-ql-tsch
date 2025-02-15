@@ -361,6 +361,7 @@ typedef Callback<void, uint64_t> MacTimeSlotStartCallback;
 class LrWpanTschMac : public LrWpanMac
 {
   public:
+    double m_beaconDelay = 0.0;
     /**
    * Get the type ID.
    *
@@ -655,6 +656,11 @@ class LrWpanTschMac : public LrWpanMac
      * \param os The reference to the output stream used by this print function.
      */
     void PrintTxQueue(std::ostream& os) const;
+
+    /**
+     * send IAM-INIT packet
+     */
+    void SendIamInit();
 
   protected:
     // Inherited from Object.

@@ -1391,7 +1391,6 @@ LrWpanTschMac::MlmeSetLinkRequest(MlmeSetLinkRequestParams params)
     switch (params.Operation)
     {
     case MlmeSetLinkRequestOperation_ADD_LINK:
-
         /*for (it = m_macLinkTable.begin();it != m_macLinkTable.end();it++) {
           if (it->slotframeHandle == params.slotframeHandle) {
 
@@ -1408,7 +1407,7 @@ LrWpanTschMac::MlmeSetLinkRequest(MlmeSetLinkRequestParams params)
                                                    // Timekeeping, b4–b7 reserved.
         entry.macLinkType = params.linkType;
         entry.slotframeHandle = params.slotframeHandle;
-        entry.macNodeAddr =
+        entry.macNodeAddr = 
             params.nodeAddr; // not using Mac16_Address because 0xffff means the link can be used
                              // for frames destined for the boradcast address
         entry.macTimeslot = params.Timeslot;           // refer to 5.1.1.5
@@ -1419,8 +1418,8 @@ LrWpanTschMac::MlmeSetLinkRequest(MlmeSetLinkRequestParams params)
 
         m_macLinkTable.push_back(entry);
         confirmParams.Status = MlmeSetLinkConfirmStatus_SUCCESS;
-
         break;
+
     case MlmeSetLinkRequestOperation_DELETE_LINK:
         for (std::list<MacPibLinkAttributes>::iterator i = m_macLinkTable.begin();
              i != m_macLinkTable.end();
@@ -1590,10 +1589,16 @@ LrWpanTschMac::IncAsn()
          it != m_macSlotframeTable.end();
          it++)
     {
-        Simulator::ScheduleNow(&LrWpanTschMac::ScheduleTimeslot,
-                               this,
-                               it->slotframeHandle,
-                               it->size);
+        // Simulator::ScheduleNow(&LrWpanTschMac::ScheduleTimeslot,
+        //                        this,
+        //                        it->slotframeHandle,
+        //                        it->size);
+
+        Simulator::Schedule(Seconds(m_beaconDelay),
+                            &LrWpanTschMac::ScheduleTimeslot,
+                            this,
+                            it->slotframeHandle,
+                            it->size);
     }
 }
 
