@@ -462,7 +462,7 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
     else if (m_trxState == IEEE_802_15_4_PHY_BUSY_RX)
     {
         // Drop the new packet.
-        NS_LOG_DEBUG(this << " packet collision");
+        NS_LOG_INFO(this << " packet collision");
         m_phyRxDropTrace(p);
 
         // Check if we correctly received the old packet up to now.
