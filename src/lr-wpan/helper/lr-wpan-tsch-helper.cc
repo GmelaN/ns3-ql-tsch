@@ -24,8 +24,9 @@
  */
 #include "lr-wpan-tsch-helper.h"
 
- #include "lr-wpan-energy-source-helper.h"
- #include "lr-wpan-radio-energy-model-helper.h"
+#include <ns3/multi-model-spectrum-channel.h>
+#include "lr-wpan-energy-source-helper.h"
+#include "lr-wpan-radio-energy-model-helper.h"
 
 #include <ns3/energy-module.h>
 #include <ns3/friis-spectrum-propagation-loss.h>
@@ -142,7 +143,7 @@ ReceivedPowerTracing(Ptr<OutputStreamWrapper> stream_rec,
 
 LrWpanTschHelper::LrWpanTschHelper(void)
 {
-    m_channel = CreateObject<SingleModelSpectrumChannel>();
+    m_channel = CreateObject<MultiModelSpectrumChannel>();
     Ptr<FriisSpectrumPropagationLossModel> model =
         CreateObject<FriisSpectrumPropagationLossModel>();
     // Ptr<LogDistancePropagationLossModel> model = CreateObject<LogDistancePropagationLossModel>
@@ -268,7 +269,7 @@ LrWpanTschHelper::EnableLogComponents(void)
     // LogComponentEnable("LrWpanInterferenceHelper", LOG_LEVEL_DEBUG);
     LogComponentEnable("LrWpanTschMac", LOG_LEVEL_DEBUG);
     // LogComponentEnable("LrWpanTschNetDevice", LOG_LEVEL_ALL);
-    LogComponentEnable("LrWpanPhy", LOG_LEVEL_INFO);
+    LogComponentEnable("LrWpanPhy", LOG_LEVEL_DEBUG);
     // LogComponentEnable("LrWpanSpectrumSignalParameters", LOG_LEVEL_ALL);
     // LogComponentEnable("LrWpanSpectrumValueHelper", LOG_LEVEL_ALL);
 }
@@ -1033,10 +1034,6 @@ LrWpanTschHelper::AddLink(NetDeviceContainer devs,
         linkRequest.linkOptions.set(2, 1);
     }
 
-
-    NS_LOG_UNCOND("\t\tChannel Offset: " << linkRequest.ChannelOffset);
-
-
     linkRequest.linkType = MlmeSetLinkRequestlinkType_NORMAL;
     linkRequest.nodeAddr = Mac16Address::ConvertFrom(devs.Get(dstPos)->GetAddress());
     //    linkRequest.linkFadingBias = FadingBias[dstPos][srcPos];
@@ -1358,7 +1355,7 @@ LrWpanTschHelper::SendOnePacket(Ptr<NetDevice> dev,
                              Ptr<Packet> pkt,
                              Address dst)
 {
-    NS_LOG_INFO("Issuing packet...");
+    NS_LOG_DEBUG("Issuing packet...");
     dev->Send(pkt, dst, 0x86DD);
 }
 
@@ -1373,7 +1370,7 @@ LrWpanTschHelper::SendPacket(Ptr<NetDevice> dev,
     Ptr<Packet> pkt = Create<Packet>(packet_size);
     if (Now().GetSeconds() <= end)
     {
-        NS_LOG_INFO("Issuing packet...");
+        NS_LOG_DEBUG("Issuing packet...");
         dev->Send(pkt, dst, 0x86DD);
     }
 
@@ -1390,6 +1387,24 @@ LrWpanTschHelper::SendPacket(Ptr<NetDevice> dev,
     }
 }
 
-} // namespace lrwpan
 
+void
+LrWpanTschHelper::PrintHoppingLists(NetDeviceContainer devs, int interval)
+{
+    for (auto i = devs.Begin(); i != devs.End(); i++)
+    {
+        DynamicCast<LrWpanTschMac>(DynamicCast<LrWpanTschNetDevice>(*i)
+            ->GetMac())->PrintChannelHoppingList(std::cout);
+    }
+
+    Simulator::Schedule(
+        Seconds(interval),
+        &LrWpanTschHelper::PrintHoppingLists,
+        devs,
+        interval
+    );
+}
+
+
+} // namespace lrwpan
 } // namespace ns3

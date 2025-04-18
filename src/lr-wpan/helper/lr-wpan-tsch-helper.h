@@ -324,6 +324,10 @@ class LrWpanTschHelper : public PcapHelperForDevice, public AsciiTraceHelperForD
 
     void EnableReceivePower(Ptr<OutputStreamWrapper> stream_recPower, NodeContainer lrwpanNodes);
 
+
+    static void PrintHoppingLists(NetDeviceContainer devs, int interval);
+
+
   private:
     // Disable implicit constructors
     LrWpanTschHelper(const LrWpanTschHelper&);
