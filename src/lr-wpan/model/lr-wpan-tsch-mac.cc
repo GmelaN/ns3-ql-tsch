@@ -56,7 +56,7 @@ namespace lrwpan
 NS_OBJECT_ENSURE_REGISTERED(LrWpanTschMac);
 
 TypeId
-LrWpanTschMac::GetTypeId(void)
+LrWpanTschMac::GetTypeId()
 {
     static TypeId tid =
         TypeId("ns3::LrWpanTschMac")
@@ -132,37 +132,55 @@ LrWpanTschMac::GetTypeId(void)
                             "ns3::LrWpanTschMac::SentTracedCallback")
 
             //Timeslot type tracing
-//            .AddTraceSource ("MacEmptyBuffer",
-//                            "Device has no packet at its buffer",
-//                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macRxEmptyBufferTrace),
-//                            "ns3::Packet::TracedCallback")
-//            .AddTraceSource ("MacRxDataTxAck",
-//                            "Device receives a data packet and sends an ACK",
-//                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macRxDataTxAckTrace))
-//            .AddTraceSource ("MacTxData",
-//                            "Device sends a data packet",
-//                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macTxDataTrace))
-//            .AddTraceSource ("MacRxData",
-//                            "Device receives a data packet",
-//                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macRxDataTrace))
-//            .AddTraceSource ("MacTxDataRxAck",
-//                            "Device sends a data packet and receives an ACK",
-//                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macTxDataRxAckTrace))
-//            .AddTraceSource ("MacSleep",
-//                            "The timeslot is not assigned for the device",
-//                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macSleepTrace))
-//            .AddTraceSource ("MacIdle",
-//                            "Device listens for a packet but does not receive one",
-//                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macIdleTrace))
-//            .AddTraceSource ("MacChannelBusy",
-//                            "Device performs a CCA and the channel is busy",
-//                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macChannelBusyTrace))
-//            .AddTraceSource ("MacWaitAck",
-//                            "Device sends a data packet, listens for an ACK but does not receive one",
-//                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macWaitAckTrace))
-//            .AddTraceSource ("MacLinkInformation",
-//                            "Received power and bias power, Channel, Rx and Tx Node ID.",
-//                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macLinkInformation))
+            .AddTraceSource ("MacEmptyBuffer",
+                            "Device has no packet at its buffer",
+                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macRxEmptyBufferTrace),
+                            "ns3::Packet::TracedCallback")
+            .AddTraceSource ("MacRxDataTxAck",
+                            "Device receives a data packet and sends an ACK",
+                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macRxDataTxAckTrace),
+                            "ns3::Packet::TracedCallback"
+                            )
+            .AddTraceSource ("MacTxData",
+                            "Device sends a data packet",
+                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macTxDataTrace),
+                            "ns3::Packet::TracedCallback"
+                            )
+            .AddTraceSource ("MacRxData",
+                            "Device receives a data packet",
+                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macRxDataTrace),
+                            "ns3::Packet::TracedCallback"
+                            )
+            .AddTraceSource ("MacTxDataRxAck",
+                            "Device sends a data packet and receives an ACK",
+                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macTxDataRxAckTrace),
+                            "ns3::Packet::TracedCallback"
+                            )
+            .AddTraceSource ("MacSleep",
+                            "The timeslot is not assigned for the device",
+                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macSleepTrace),
+                            "ns3::Packet::TracedCallback"
+                            )
+            .AddTraceSource ("MacIdle",
+                            "Device listens for a packet but does not receive one",
+                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macIdleTrace),
+                            "ns3::Packet::TracedCallback"
+                            )
+            .AddTraceSource ("MacChannelBusy",
+                            "Device performs a CCA and the channel is busy",
+                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macChannelBusyTrace),
+                            "ns3::Packet::TracedCallback"
+                            )
+            .AddTraceSource ("MacWaitAck",
+                            "Device sends a data packet, listens for an ACK but does not receive one",
+                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macWaitAckTrace),
+                            "ns3::Packet::TracedCallback"
+                            )
+            .AddTraceSource ("MacLinkInformation",
+                            "Received power and bias power, Channel, Rx and Tx Node ID.",
+                            MakeTraceSourceAccessor (&LrWpanTschMac::m_macLinkInformation),
+                            "ns3::Packet::TracedCallback"
+                            )
         ;
     return tid;
 }
@@ -1218,7 +1236,7 @@ LrWpanTschMac::SetPanId(uint16_t PanId)
 void
 LrWpanTschMac::ChangeMacState(TschMacState newState)
 {
-    char* current, *new_;
+    const char* current, *new_;
 
     switch(newState) {
         case TSCH_MAC_IDLE:

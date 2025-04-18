@@ -1358,7 +1358,7 @@ LrWpanTschHelper::SendOnePacket(Ptr<NetDevice> dev,
                              Ptr<Packet> pkt,
                              Address dst)
 {
-    NS_LOG_UNCOND("Issuing packet...");
+    NS_LOG_INFO("Issuing packet...");
     dev->Send(pkt, dst, 0x86DD);
 }
 
@@ -1373,7 +1373,7 @@ LrWpanTschHelper::SendPacket(Ptr<NetDevice> dev,
     Ptr<Packet> pkt = Create<Packet>(packet_size);
     if (Now().GetSeconds() <= end)
     {
-        NS_LOG_UNCOND("Issuing packet...");
+        NS_LOG_INFO("Issuing packet...");
         dev->Send(pkt, dst, 0x86DD);
     }
 
