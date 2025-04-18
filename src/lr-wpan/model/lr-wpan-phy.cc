@@ -203,7 +203,13 @@ LrWpanPhy::GetTypeId()
                             "Trace source indicating a packet has been "
                             "dropped by the device during reception",
                             MakeTraceSourceAccessor(&LrWpanPhy::m_phyRxDropTrace),
+                            "ns3::Packet::TracedCallback")
+            .AddTraceSource("PhyPacketCollision",
+                            "Trace source indicating a packet has been "
+                            "dropped by the packet collision",
+                            MakeTraceSourceAccessor(&LrWpanPhy::m_phyPacketCollisionTrace),
                             "ns3::Packet::TracedCallback");
+                            ;
     return tid;
 }
 
@@ -462,8 +468,10 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
     else if (m_trxState == IEEE_802_15_4_PHY_BUSY_RX)
     {
         // Drop the new packet.
-        NS_LOG_INFO(this << " packet collision");
+        NS_LOG_DEBUG(this << " packet collision");
         m_phyRxDropTrace(p);
+
+        m_phyPacketCollisionTrace(p);
 
         // Check if we correctly received the old packet up to now.
         CheckInterference();
@@ -622,6 +630,11 @@ LrWpanPhy::EndRx(Ptr<SpectrumSignalParameters> par)
             // The packet was destroyed due to interference, post-rx corruption or
             // cancelled, therefore drop it.
             m_phyRxDropTrace(currentPacket);
+
+
+            // m_phyPacketCollisionTrace(currentPacket);
+
+            
             m_currentRxPacket = std::make_pair(nullptr, true);
 
             if (!m_isRxCanceled)

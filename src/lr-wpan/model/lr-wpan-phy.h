@@ -746,6 +746,15 @@ class LrWpanPhy : public SpectrumPhy
      */
     TracedCallback<Ptr<const Packet>> m_phyRxDropTrace;
 
+
+    /**
+     * The trace source fired when the phy layer drops a packet it has received.
+     * (Destruction of a packet due to interference, post-rx corruption)
+     *
+     * \see class CallBackTraceSource
+     */  
+    TracedCallback<Ptr<const Packet>> m_phyPacketCollisionTrace;
+
     /**
      * The trace source fired when the phy layer changes the transceiver state.
      *
