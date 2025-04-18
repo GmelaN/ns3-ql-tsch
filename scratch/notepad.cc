@@ -20,6 +20,8 @@ using namespace ns3::lrwpan;
 
 #define NODE_COUNT 2 // minimum 2
 
+// Each device must be attached to the same channel
+Ptr<MultiModelSpectrumChannel> m_channel;
 
 class PanNetwork
 {
@@ -28,8 +30,7 @@ class PanNetwork
     LrWpanTschHelper lrWpanHelper;
     MobilityHelper mobHelper;
 
-    // Each device must be attached to the same channel
-    Ptr<MultiModelSpectrumChannel> m_channel;
+
 
     // devices
     NetDeviceContainer devList;
@@ -132,6 +133,8 @@ main(int argc, char* argv[])
 
 
     LogComponentEnable("LrWpanTschMac", LOG_LEVEL_ALL);
+    LogComponentEnable("LrWpanPhy", LOG_LEVEL_ALL);
+    LogComponentEnable("MultiModelSpectrumChannel", LOG_LEVEL_ALL);
     LogComponentEnable("LrWpanTschNetDevice", LOG_LEVEL_ALL);
 
 
