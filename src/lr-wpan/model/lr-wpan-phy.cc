@@ -471,7 +471,7 @@ LrWpanPhy::StartRx(Ptr<SpectrumSignalParameters> spectrumRxParams)
         NS_LOG_DEBUG(this << " packet collision");
         m_phyRxDropTrace(p);
 
-        m_phyPacketCollisionTrace(p);
+        // m_phyPacketCollisionTrace(p);
 
         // Check if we correctly received the old packet up to now.
         CheckInterference();
@@ -632,7 +632,7 @@ LrWpanPhy::EndRx(Ptr<SpectrumSignalParameters> par)
             m_phyRxDropTrace(currentPacket);
 
 
-            // m_phyPacketCollisionTrace(currentPacket);
+            m_phyPacketCollisionTrace(currentPacket);
 
             
             m_currentRxPacket = std::make_pair(nullptr, true);
