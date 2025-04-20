@@ -181,6 +181,11 @@ LrWpanTschMac::GetTypeId()
                             MakeTraceSourceAccessor (&LrWpanTschMac::m_macLinkInformation),
                             "ns3::Packet::TracedCallback"
                             )
+            .AddTraceSource("PassedOneHoppingSequenceTrace",
+                            "Passed one period of hopping sequence list.",
+                            MakeTraceSourceAccessor(&LrWpanTschMac::m_PassedOneHoppingSequenceTrace),
+                            "ns3::TracedValueCallback::Uint64"
+                            )
         ;
     return tid;
 }
@@ -1571,6 +1576,25 @@ LrWpanTschMac::IncAsn()
     NS_LOG_FUNCTION(this);
     m_newSlot = 1;
     m_macTschPIBAttributes.m_macASN++;
+
+    // are we passed one period of hopping sequences?
+    if (
+        m_macTschPIBAttributes.m_macASN != 0
+        && m_macTschPIBAttributes.m_macASN
+            % def_MacChannelHopping.m_macHoppingSequenceLength
+            == 0
+    )
+    {
+        NS_LOG_DEBUG(
+            "NEW BEACON PERIOD STARTED: "
+            << m_macTschPIBAttributes.m_macASN
+            << " (total "
+            << def_MacChannelHopping.m_macHoppingSequenceLength
+            << ")"
+        );
+        m_PassedOneHoppingSequenceTrace(m_macTschPIBAttributes.m_macASN);
+    }
+
     if (!m_macTimeSlotStartCallback.IsNull())
     {
         m_macTimeSlotStartCallback(m_macTschPIBAttributes.m_macASN);
@@ -1607,16 +1631,16 @@ LrWpanTschMac::IncAsn()
          it != m_macSlotframeTable.end();
          it++)
     {
-        // Simulator::ScheduleNow(&LrWpanTschMac::ScheduleTimeslot,
-        //                        this,
-        //                        it->slotframeHandle,
-        //                        it->size);
+        Simulator::ScheduleNow(&LrWpanTschMac::ScheduleTimeslot,
+                               this,
+                               it->slotframeHandle,
+                               it->size);
 
-        Simulator::Schedule(Seconds(m_beaconDelay),
-                            &LrWpanTschMac::ScheduleTimeslot,
-                            this,
-                            it->slotframeHandle,
-                            it->size);
+        // Simulator::Schedule(Seconds(m_beaconDelay),
+        //                     &LrWpanTschMac::ScheduleTimeslot,
+        //                     this,
+        //                     it->slotframeHandle,
+        //                     it->size);
     }
 }
 
@@ -1921,13 +1945,13 @@ LrWpanTschMac::SetDefaultHoppingSequence(uint16_t sequenceLength)
         chtmpl.m_macHoppingSequenceList[SHUFFLE[i]] = aux;
     }
 
-    /*
-    uint8_t uniq_ch = 15;
-    for (unsigned char i = 0;i<sequenceLength;i++)
-      {
-         chtmpl.m_macHoppingSequenceList[i] = uniq_ch;
-      }
-  */
+    // int k = 0;
+    // int a[3] = {11};
+    // for (unsigned char i = 0; i < sequenceLength; i++)
+    // {
+    //     chtmpl.m_macHoppingSequenceList[i] = a[(k++) % 1];
+    //     SHUFFLE[i] = LFSR_OUTPUT[i] % sequenceLength;
+    // }
 
     chtmpl.m_macHoppingSequenceLength = sequenceLength;
 
@@ -2077,6 +2101,7 @@ LrWpanTschMac::HandleTxFailure()
     if (m_txQueueAllLink[m_txLinkSequence]->txQueuePerLink.front()->txRequestNB ==
         m_macMaxFrameRetries)
     {
+        NS_LOG_DEBUG("Maximum Retries reached, dropping TX packet.");
         if (!m_mcpsDataConfirmCallback.IsNull())
         {
             McpsDataConfirmParams confirmParams;

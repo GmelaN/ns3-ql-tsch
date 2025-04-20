@@ -789,6 +789,8 @@ class LrWpanTschMac : public LrWpanMac
      */
     TracedCallback<Ptr<const Packet>> m_macRxDropTrace;
 
+    TracedCallback<uint64_t> m_PassedOneHoppingSequenceTrace;
+
     /**
    * A trace source that emulates a non-promiscuous protocol sniffer connected
    * to the device.  Unlike your average everyday sniffer, this trace source
