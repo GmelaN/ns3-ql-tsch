@@ -42,14 +42,12 @@ NS_LOG_COMPONENT_DEFINE("LrWpanTschHelper");
 
 namespace ns3
 {
-
 namespace lrwpan
 {
-
 void
-LrWpanTschHelper::SetChannel(Ptr<SpectrumChannel> channel)
+LrWpanTschHelper::SetChannel(uint8_t channel)
 {
-    m_channel = channel;
+    m_channelIdx = channel;
 }
 
 static void
@@ -143,12 +141,7 @@ ReceivedPowerTracing(Ptr<OutputStreamWrapper> stream_rec,
 
 LrWpanTschHelper::LrWpanTschHelper(void)
 {
-    m_channel = CreateObject<MultiModelSpectrumChannel>();
-    Ptr<FriisSpectrumPropagationLossModel> model =
-        CreateObject<FriisSpectrumPropagationLossModel>();
-    // Ptr<LogDistancePropagationLossModel> model = CreateObject<LogDistancePropagationLossModel>
-    // ();
-    m_channel->AddSpectrumPropagationLossModel(model);
+    m_channelIdx = 11;
     m_slotframehandle = 0;
     m_numchannel = 16;
     m_numnode = 0;
@@ -156,47 +149,47 @@ LrWpanTschHelper::LrWpanTschHelper(void)
     MaxFadingBias = 0;
 }
 
-LrWpanTschHelper::LrWpanTschHelper(Ptr<SpectrumChannel> ch)
-{
-    m_channel = ch;
-    m_slotframehandle = 0;
-    m_numchannel = 16;
-    m_numnode = 0;
-    m_fadingBiasMatrix = false;
-    m_isDay = true;
-    MinFadingBias = 0;
-    MaxFadingBias = 0;
-}
+// LrWpanTschHelper::LrWpanTschHelper(Ptr<SpectrumChannel> ch)
+// {
+//     m_channel = ch;
+//     m_slotframehandle = 0;
+//     m_numchannel = 16;
+//     m_numnode = 0;
+//     m_fadingBiasMatrix = false;
+//     m_isDay = true;
+//     MinFadingBias = 0;
+//     MaxFadingBias = 0;
+// }
 
-LrWpanTschHelper::LrWpanTschHelper(Ptr<SpectrumChannel> ch,
-                                   u_int32_t num_node,
-                                   bool fadingBiasMatrix,
-                                   bool isDay)
-{
-    m_channel = ch;
-    m_slotframehandle = 0;
-    m_numchannel = 16;
-    m_numnode = num_node;
-    m_fadingBiasMatrix = fadingBiasMatrix;
-    m_isDay = isDay;
-    if (m_isDay)
-    {
-        MinFadingBias = -10;
-        MaxFadingBias = 5;
-    }
-    else
-    {
-        MinFadingBias = -15;
-        MaxFadingBias = 10;
-    }
-
-    //    SetFadingBiasValues();
-}
+// LrWpanTschHelper::LrWpanTschHelper(Ptr<SpectrumChannel> ch,
+//                                    u_int32_t num_node,
+//                                    bool fadingBiasMatrix,
+//                                    bool isDay)
+// {
+//     m_channel = ch;
+//     m_slotframehandle = 0;
+//     m_numchannel = 16;
+//     m_numnode = num_node;
+//     m_fadingBiasMatrix = fadingBiasMatrix;
+//     m_isDay = isDay;
+//     if (m_isDay)
+//     {
+//         MinFadingBias = -10;
+//         MaxFadingBias = 5;
+//     }
+//     else
+//     {
+//         MinFadingBias = -15;
+//         MaxFadingBias = 10;
+//     }
+//
+//     //    SetFadingBiasValues();
+// }
 
 LrWpanTschHelper::~LrWpanTschHelper(void)
 {
-    m_channel->Dispose();
-    m_channel = 0;
+    // m_channel->Dispose();
+    // m_channel = 0;
 }
 
 // void
@@ -362,7 +355,7 @@ LrWpanTschHelper::Install(NodeContainer c)
         Ptr<Node> node = *i;
 
         Ptr<LrWpanTschNetDevice> netDevice = CreateObject<LrWpanTschNetDevice>();
-        netDevice->SetChannel(m_channel);
+        netDevice->SetChannel(m_channelIdx);
         node->AddDevice(netDevice);
         netDevice->SetNode(node);
         netDevice->SetTschMode(true);
@@ -383,7 +376,7 @@ LrWpanTschHelper::InstallVector(NodeContainer c)
         Ptr<Node> node = *i;
 
         Ptr<LrWpanTschNetDevice> netDevice = CreateObject<LrWpanTschNetDevice>();
-        netDevice->SetChannel(m_channel);
+        netDevice->SetChannel(m_channelIdx);
         node->AddDevice(netDevice);
         netDevice->SetNode(node);
         // todo: add the capability to change short address, extended

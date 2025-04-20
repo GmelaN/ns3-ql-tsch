@@ -186,9 +186,19 @@ LrWpanTschNetDevice::SetCsmaCa(Ptr<LrWpanCsmaCa> csmaca)
 void
 LrWpanTschNetDevice::SetChannel(Ptr<SpectrumChannel> channel)
 {
+    NS_ASSERT_MSG(false, "use SetChannel(uint8_t) instead.");
+
+    // NS_LOG_FUNCTION(this << channel);
+    // m_phy->SetChannel(channel);
+    // channel->AddRx(m_phy);
+    // CompleteConfig();
+}
+
+void
+LrWpanTschNetDevice::SetChannel(uint8_t channel)
+{
     NS_LOG_FUNCTION(this << channel);
     m_phy->SetChannel(channel);
-    channel->AddRx(m_phy);
     CompleteConfig();
 }
 

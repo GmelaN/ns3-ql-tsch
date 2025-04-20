@@ -149,6 +149,9 @@ operator<<(std::ostream& os, const TracedValue<PhyEnumeration>& state)
     return os << s;
 };
 
+Ptr<SingleModelSpectrumChannel> LrWpanPhy::ChannelPool[CHANNEL_COUNT];
+
+
 TypeId
 LrWpanPhy::GetTypeId()
 {
@@ -232,6 +235,18 @@ LrWpanPhy::LrWpanPhy()
 
     m_isRxCanceled = false;
     ChangeTrxState(IEEE_802_15_4_PHY_TRX_OFF);
+
+    for (int i = 0; i < CHANNEL_COUNT; i++)
+    {
+        ChannelPool[i] = CreateObject<SingleModelSpectrumChannel>();
+        Ptr<LogDistancePropagationLossModel> propModel =
+        CreateObject<LogDistancePropagationLossModel>();
+        Ptr<ConstantSpeedPropagationDelayModel> delayModel =
+            CreateObject<ConstantSpeedPropagationDelayModel>();
+        ChannelPool[i]->AddPropagationLossModel(propModel);
+        ChannelPool[i]->SetPropagationDelayModel(delayModel);
+    }
+    m_channel = 11 - 11;
 }
 
 LrWpanPhy::~LrWpanPhy()
@@ -275,7 +290,7 @@ LrWpanPhy::DoDispose()
 
     m_mobility = nullptr;
     m_device = nullptr;
-    m_channel = nullptr;
+    // m_channel = nullptr;
     m_antenna = nullptr;
     m_txPsd = nullptr;
     m_noise = nullptr;
@@ -331,17 +346,29 @@ LrWpanPhy::SetMobility(Ptr<MobilityModel> m)
 }
 
 void
-LrWpanPhy::SetChannel(Ptr<SpectrumChannel> c)
+LrWpanPhy::SetChannel(Ptr<SpectrumChannel> channel)
 {
-    NS_LOG_FUNCTION(this << c);
-    m_channel = c;
+    NS_ASSERT_MSG(false, "channel is initialized by other method.");
+}
+
+
+void
+LrWpanPhy::SetChannel(uint8_t channel)
+{
+    NS_LOG_FUNCTION(this << channel);
+    NS_ASSERT_MSG(channel >= 11 && channel <= 26, "channel >= 11 && channel <= 26");
+
+    ChannelPool[m_channel]->RemoveRx(this);
+    channel -= 11;
+    m_channel = channel;
+    ChannelPool[m_channel]->AddRx(this);
 }
 
 Ptr<SpectrumChannel>
 LrWpanPhy::GetChannel()
 {
     NS_LOG_FUNCTION(this);
-    return m_channel;
+    return ChannelPool[m_channel];
 }
 
 Ptr<const SpectrumModel>
@@ -672,7 +699,7 @@ LrWpanPhy::PdDataRequest(const uint32_t psduLength, Ptr<Packet> p)
         if (m_trxState == IEEE_802_15_4_PHY_TX_ON)
         {
             // send down
-            NS_ASSERT(m_channel);
+            NS_ASSERT(ChannelPool[m_channel]);
 
             // Remove a possible LQI tag from a previous transmission of the packet.
             LrWpanLqiTag lqiTag;
@@ -690,7 +717,7 @@ LrWpanPhy::PdDataRequest(const uint32_t psduLength, Ptr<Packet> p)
             Ptr<PacketBurst> pb = CreateObject<PacketBurst>();
             pb->AddPacket(p);
             txParams->packetBurst = pb;
-            m_channel->StartTx(txParams);
+            ChannelPool[m_channel]->StartTx(txParams);
             m_pdDataRequest = Simulator::Schedule(txParams->duration, &LrWpanPhy::EndTx, this);
             ChangeTrxState(IEEE_802_15_4_PHY_BUSY_TX);
             return;
@@ -1314,6 +1341,7 @@ LrWpanPhy::PlmeSetAttributeRequest(PhyPibAttributeIdentifier id, Ptr<PhyPibAttri
             }
 
             m_phyPIBAttributes.phyCurrentChannel = attribute->phyCurrentChannel;
+            SetChannel(attribute->phyCurrentChannel);
 
             // use the prev configured sensitivity before changing the channel
             SetRxSensitivity(WToDbm(m_rxSensitivity));

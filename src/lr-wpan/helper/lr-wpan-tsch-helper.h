@@ -67,19 +67,19 @@ struct AddLinkParams
 class LrWpanTschHelper : public PcapHelperForDevice, public AsciiTraceHelperForDevice
 {
   public:
-    void SetChannel(Ptr<SpectrumChannel> channel);
+    void SetChannel(uint8_t channel);
 
 
     /**
      * @brief LrWpanTschHelper: Create a LrWpan helper in an empty state.
      */
-    LrWpanTschHelper(void);
-    LrWpanTschHelper(Ptr<SpectrumChannel> ch);
-    LrWpanTschHelper(Ptr<SpectrumChannel> ch,
-                     u_int32_t num_node,
-                     bool fadingBiasMatrix,
-                     bool isDay);
-    virtual ~LrWpanTschHelper(void);
+    LrWpanTschHelper();
+    // LrWpanTschHelper(Ptr<SpectrumChannel> ch);
+    // LrWpanTschHelper(Ptr<SpectrumChannel> ch,
+    //                  u_int32_t num_node,
+    //                  bool fadingBiasMatrix,
+    //                  bool isDay);
+    virtual ~LrWpanTschHelper();
 
     /**
      * @brief AddMobility: Add mobility model to a physical device
@@ -379,7 +379,7 @@ class LrWpanTschHelper : public PcapHelperForDevice, public AsciiTraceHelperForD
                               Ptr<NetDevice> nd,
                               bool explicitFilename);
 
-    Ptr<SpectrumChannel> m_channel; // channel model
+    uint8_t m_channelIdx; // channel model
     int m_slotframehandle;          // slotframe handle
     u_int32_t m_numchannel;         // number of TSCH channels, default 16
     u_int32_t m_numnode;            // number of lrwpan nodes

@@ -92,6 +92,7 @@ class LrWpanTschNetDevice : public NetDevice
      * \param channel the channel to be used
      */
     void SetChannel(Ptr<SpectrumChannel> channel);
+    void SetChannel(uint8_t channel);
 
     /**
      * Get the MAC used by this NetDevice.

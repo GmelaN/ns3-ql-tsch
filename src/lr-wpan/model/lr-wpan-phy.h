@@ -21,6 +21,7 @@
 #ifndef LR_WPAN_PHY_H
 #define LR_WPAN_PHY_H
 
+#include <ns3/single-model-spectrum-channel.h>
 #include "lr-wpan-interference-helper.h"
 
 #include <ns3/event-id.h>
@@ -29,6 +30,8 @@
 #include <ns3/traced-value.h>
 
 #include <iostream>
+
+#define CHANNEL_COUNT 16 // 11~26
 
 namespace ns3
 {
@@ -275,6 +278,8 @@ typedef Callback<void, PhyEnumeration, PhyPibAttributeIdentifier> PlmeSetAttribu
  */
 class LrWpanPhy : public SpectrumPhy
 {
+  static Ptr<SingleModelSpectrumChannel> ChannelPool[CHANNEL_COUNT];
+
   public:
     /**
      * Get the type ID.
@@ -293,6 +298,7 @@ class LrWpanPhy : public SpectrumPhy
     void SetMobility(Ptr<MobilityModel> m) override;
     Ptr<MobilityModel> GetMobility() const override;
     void SetChannel(Ptr<SpectrumChannel> c) override;
+    void SetChannel(uint8_t channel);
 
     /**
      * Get the currently attached channel.
@@ -812,7 +818,7 @@ class LrWpanPhy : public SpectrumPhy
     /**
      * The channel attached to this transceiver.
      */
-    Ptr<SpectrumChannel> m_channel;
+    uint8_t m_channel;
 
     /**
      * The antenna used by the transceiver.
