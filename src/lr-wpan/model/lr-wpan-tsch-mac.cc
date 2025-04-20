@@ -716,7 +716,11 @@ LrWpanTschMac::PdDataIndication(uint32_t psduLength, Ptr<Packet> p, uint8_t lqi)
                     LrWpanMacHeader macHdr;
                     m_txPkt->PeekHeader(macHdr);
 
-                    m_macTxDataRxAckTrace(m_latestPacketSize);
+                    m_macTxDataRxAckTrace({
+                        m_currentChannel,
+                        m_macTschPIBAttributes.m_macASN % def_MacChannelHopping.m_macHoppingSequenceLength
+                    });
+
                     m_setMacState.Cancel();
                     m_setMacState = Simulator::ScheduleNow(&LrWpanTschMac::SetLrWpanMacState,
                                                            this,
@@ -1456,6 +1460,7 @@ LrWpanTschMac::MlmeSetLinkRequest(MlmeSetLinkRequestParams params)
                 if (currentLink.active && currentLink.slotframeHandle == params.slotframeHandle &&
                     currentLink.linkHandle == params.linkHandle)
                 {
+                    NS_ASSERT_MSG(false, "DELETE ACTIVE LINK!!");
                     m_waitingLink = true;
                     m_waitingLinkParams = params;
                 }

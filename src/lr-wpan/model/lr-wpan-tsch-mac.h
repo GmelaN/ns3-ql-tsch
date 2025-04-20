@@ -1063,10 +1063,10 @@ class LrWpanTschMac : public LrWpanMac
 
     /**
    * The trace source fired when device sends a data packet and receives an ACK
-   *
+   * {channel, timeslot}
    * \see class CallBackTraceSource
      */
-    TracedCallback<uint32_t> m_macTxDataRxAckTrace;
+    TracedCallback<std::pair<uint8_t, uint32_t>> m_macTxDataRxAckTrace;
 
     /**
    * The trace source fired when the timeslot is not assigned for the device
