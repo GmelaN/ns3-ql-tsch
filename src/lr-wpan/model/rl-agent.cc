@@ -45,6 +45,11 @@ Agent::Agent(NetDeviceContainer devs)
     m_qTable.resize(m_timeslotCount, std::vector<double>(m_channelCount, 0.0));
     m_isSucceed.resize(m_timeslotCount, std::vector<bool>(m_channelCount, false));
 
+
+    for(auto i = m_devs.Begin(); i < m_devs.End(); i++)
+    {
+        DynamicCast<LrWpanTschNetDevice>(*i)->GetNMac()->SetHoppingSequence(m_currentConfiguration, 0);
+    }
 }
 
 Agent::~Agent()
@@ -60,7 +65,7 @@ Agent::ChooseAction(uint32_t slot)
     {
         uint8_t randChannel = m_random->GetInteger() % m_channelCount + 11;
         NS_LOG_DEBUG("(exploration) channel " << 11 + (int) randChannel);
-        return randChannel;
+        return 11 + randChannel;
     }
 
     NS_LOG_DEBUG("PAN " << panId << " not active, only exploitation.");
@@ -95,7 +100,7 @@ Agent::OnePeriodHoppingSequencePassed(uint64_t macAsn)
             // get best Q value from next slot
             if (t >= m_timeslotCount - 1)
             {
-                m_qTable[t][c] = (1-m_params.alpha) * m_qTable[t][c] + m_params.alpha * r;
+                m_qTable[t][c-11] = (1-m_params.alpha) * m_qTable[t][c-11] + m_params.alpha * r;
             }
             else
             {
@@ -104,7 +109,7 @@ Agent::OnePeriodHoppingSequencePassed(uint64_t macAsn)
                 {
                     maxQNext = std::max(maxQNext, m_qTable[(t + 1) % m_timeslotCount][c2]);
                 }
-                m_qTable[t][c] = (1 - m_params.alpha) * m_qTable[t][c]
+                m_qTable[t][c-11] = (1 - m_params.alpha) * m_qTable[t][c-11]
                     + m_params.alpha * (r + m_params.gamma * maxQNext);
             }
             NS_LOG_DEBUG("giving reward " << r << " to timeslot: " << t << " channel: " << static_cast<int>(c));
@@ -145,6 +150,8 @@ Agent::DeployNewPolicy()
     NS_LOG_FUNCTION(this);
     std::vector<uint8_t> slots; // slots[slot] = channel
 
+    m_currentConfiguration.clear();
+
     // get actions
     NS_LOG_DEBUG("time slot configuration: ");
     for(size_t i = 0; i < m_timeslotCount; i++)
@@ -175,7 +182,7 @@ Agent::CountSucceed(std::pair<uint8_t, uint32_t> info)
 
     NS_LOG_DEBUG("transmission succeed at: [channel " << static_cast<int>(ch) << "\t, slot " << slot << "]");
 
-    m_isSucceed[slot][ch] = true;
+    m_isSucceed[slot][ch-11] = true;
 }
 
 
