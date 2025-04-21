@@ -23,6 +23,7 @@ build_lib(
     model/lr-wpan-tsch-mac.cc
     model/lr-wpan-energy-source.cc
     model/lr-wpan-radio-energy-model.cc
+    model/rl-agent.cc
   HEADER_FILES
     helper/lr-wpan-helper.h
     helper/lr-wpan-tsch-helper.h
@@ -48,6 +49,7 @@ build_lib(
     model/lr-wpan-tsch-mac.h
     model/lr-wpan-energy-source.h
     model/lr-wpan-radio-energy-model.h
+    model/rl-agent.h
   LIBRARIES_TO_LINK
     ${libenergy}
     ${libspectrum}

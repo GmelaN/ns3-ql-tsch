@@ -14,7 +14,7 @@
 #include <ns3/callback.h>
 #include <ns3/log.h>
 
-NS_LOG_COMPONENT_DEFINE("Agent");
+// NS_LOG_COMPONENT_DEFINE("Agent");
 
 using namespace ns3::lrwpan;
 
@@ -35,7 +35,7 @@ struct QAgentParams
 class Agent: public Object
 {
   public:
-    TypeId GetTypeId();
+    static TypeId GetTypeId();
     Agent();
     Agent(NetDeviceContainer devs);
     ~Agent();
@@ -82,6 +82,11 @@ class Agent: public Object
     uint32_t total_count = 0;
     double_t totalDelay = 0;
 
+    uint32_t panId = 0;
+
+    bool active = true;
+    uint8_t deactiveCount = 0;
+    const uint8_t m_deactiveCount = 5;
 
 private:
     LrWpanTschHelper* m_helper;
@@ -99,8 +104,6 @@ private:
 
     uint8_t m_currentAction;
     uint8_t m_panId;
-
-    uint8_t* m_linkHandles;
 
     // beacon scale stats
     uint32_t m_macRxDrop = 0;
